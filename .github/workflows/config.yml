@@ -2,22 +2,23 @@ name: branch-protection
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+
 jobs:
   enforce-branch-rules:
     runs-on: windows-latest
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [20]
     steps:
       - name: Check for code changes
         run: git diff --quiet || exit 1
-      - name: Enforce rules
-        run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
-            # Code coverage report
-            # Code linting
-            # Unit tests
-          fi
+      - name: Enforce code coverage
+        run: npm run coverage
+      - name: Verify code linting
+        run: npm run lint
+      - name: Run unit tests
+        run: npm run test
       - name: Complete job
-        run: echo "Job completed successfully."
+        run: echo "Job complete"
