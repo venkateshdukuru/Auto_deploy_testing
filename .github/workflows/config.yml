@@ -2,8 +2,8 @@ name: branch-protection
 
 on:
   push:
-    branches: [main]
-
+    branches:
+      - main
 jobs:
   enforce-branch-rules:
     runs-on: windows-latest
@@ -12,18 +12,12 @@ jobs:
         node-version: [20]
     steps:
       - name: Check for code changes
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          # Commands to check for code changes
-      - name: Enforce code coverage report
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          # Commands to enforce code coverage report
-      - name: Verify code linting and unit tests
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          # Commands to verify code linting and unit tests
+        uses: actions/checkout@v2
+      - name: Enforce code coverage
+        run: npm run coverage
+      - name: Verify code linting
+        run: npm run lint
+      - name: Run unit tests
+        run: npm run test
       - name: Complete job
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          # Commands to complete job
+        run: echo "Job completed successfully."
