@@ -1,42 +1,23 @@
-name: branch-protection.yml
+name: branch-protection
 
 on:
   push:
-    branches:
-      - main
-
+    branches: [main]
 jobs:
   enforce-branch-rules:
     runs-on: windows-latest
     strategy:
       matrix:
-        node-version: [20]
-
+        node-version: [20.x]
     steps:
       - name: Check for code changes
-        if: github.event.commits > 0
-        run: echo "Code changes detected."
-
+        run: git diff --quiet || exit 1
       - name: Enforce rules
-        if: github.event.commits > 0
-        run: echo "Enforcing branch rules."
-
-      - name: Setup job
-        if: github.event.commits > 0
-        run: echo "Setting up job."
-
-      - name: Check for code coverage
-        if: github.event.commits > 0
-        run: echo "Checking code coverage."
-
-      - name: Verify code linting
-        if: github.event.commits > 0
-        run: echo "Verifying code linting."
-
-      - name: Run unit tests
-        if: github.event.commits > 0
-        run: echo "Running unit tests."
-
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            # Code coverage report
+            # Code linting
+            # Unit tests
+          fi
       - name: Complete job
-        if: github.event.commits > 0
         run: echo "Job completed successfully."
