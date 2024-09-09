@@ -12,35 +12,16 @@ jobs:
         node-version: [20]
     steps:
       - name: Check for code changes
-        id: check-changes
-        run: |
-          if [ -n "$(git diff --name-only ${{ github.sha }}^ ${{ github.sha }})" ]; then
-            echo "Code changes detected"
-          else
-            echo "No code changes detected"
-          fi
+        uses: actions/checkout@v2
 
-      - name: Enforce rules
-        if: steps.check-changes.outputs.code-changes == 'Code changes detected'
+      - name: Enforce code coverage report
         run: |
-          # Add suitable enforce rules here
+          # code to enforce code coverage
 
-      - name: Set up job
+      - name: Verify code linting and unit tests
         run: |
-          # Add your own requirements here
-
-      - name: Check for code coverage
-        run: |
-          # Add code coverage report here
-
-      - name: Verify code linting
-        run: |
-          # Add code linting here
-
-      - name: Run unit tests
-        run: |
-          # Add unit tests here
+          # code to verify linting and unit tests
 
       - name: Complete job
         run: |
-          # Add any final steps here
+          # code to complete job successfully
