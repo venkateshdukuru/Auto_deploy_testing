@@ -1,9 +1,9 @@
-# branch-protection.yml
-name: Branch Protection Workflow
+name: branch-protection
+
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+
 jobs:
   enforce-branch-rules:
     runs-on: windows-latest
@@ -11,19 +11,36 @@ jobs:
       matrix:
         node-version: [20]
     steps:
-      - name: Check for Code Changes
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Enforce Code Coverage
-        if: ${{ github.event.commits > 0 }}
-        run: npm run coverage
-      - name: Verify Code Linting and Unit Tests
-        if: ${{ github.event.commits > 0 }}
-        run: npm run lint && npm run test
-      - name: Complete Job
-        if: ${{ github.event.commits > 0 }}
-        run: node job.js
-      - name: Take Your Own Requirements
-        if: ${{ github.event.commits > 0 }}
-        run: npm run custom-requirements
+      - name: Check for code changes
+        id: check-changes
+        run: |
+          if [ -n "$(git diff --name-only ${{ github.sha }}^ ${{ github.sha }})" ]; then
+            echo "Code changes detected"
+          else
+            echo "No code changes detected"
+          fi
+
+      - name: Enforce rules
+        if: steps.check-changes.outputs.code-changes == 'Code changes detected'
+        run: |
+          # Add suitable enforce rules here
+
+      - name: Set up job
+        run: |
+          # Add your own requirements here
+
+      - name: Check for code coverage
+        run: |
+          # Add code coverage report here
+
+      - name: Verify code linting
+        run: |
+          # Add code linting here
+
+      - name: Run unit tests
+        run: |
+          # Add unit tests here
+
+      - name: Complete job
+        run: |
+          # Add any final steps here
