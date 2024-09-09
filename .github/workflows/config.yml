@@ -1,37 +1,21 @@
-name: branch-protection.yml
-
+name: branch-protection
 on:
   push:
     branches: [main]
-
 jobs:
   enforce-branch-rules:
     runs-on: windows-latest
     strategy:
       matrix:
         node-version: [20]
-    
     steps:
       - name: Check for code changes
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          git diff --name-only HEAD^ HEAD | grep -qE '.*\.(js|ts)$'
-          
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Enforce code coverage report
-        if: steps.check_changes.outputs.has_changes == 'true'
-        run: |
-          # insert code coverage report command here
-          
+        run: <insert code coverage command>
       - name: Verify code linting and unit tests
-        if: steps.check_changes.outputs.has_changes == 'true'
-        run: |
-          # insert code linting and unit tests command here
-          
+        run: <insert linting and unit test command>
       - name: Complete job
-        if: always()
-        run: |
-          # insert code to complete job here
-          
-      - name: Set up job
-        run: |
-          # insert code to set up job here
+        run: <insert completion command>
