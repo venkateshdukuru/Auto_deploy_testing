@@ -1,5 +1,5 @@
-name: branch-protection
-
+# branch-protection.yml
+name: Branch Protection Workflow
 on:
   push:
     branches:
@@ -11,13 +11,19 @@ jobs:
       matrix:
         node-version: [20]
     steps:
-      - name: Check for code changes
+      - name: Check for Code Changes
         uses: actions/checkout@v2
-      - name: Enforce code coverage
+        with:
+          fetch-depth: 0
+      - name: Enforce Code Coverage
+        if: ${{ github.event.commits > 0 }}
         run: npm run coverage
-      - name: Verify code linting
-        run: npm run lint
-      - name: Run unit tests
-        run: npm run test
-      - name: Complete job
-        run: echo "Job completed successfully."
+      - name: Verify Code Linting and Unit Tests
+        if: ${{ github.event.commits > 0 }}
+        run: npm run lint && npm run test
+      - name: Complete Job
+        if: ${{ github.event.commits > 0 }}
+        run: node job.js
+      - name: Take Your Own Requirements
+        if: ${{ github.event.commits > 0 }}
+        run: npm run custom-requirements
