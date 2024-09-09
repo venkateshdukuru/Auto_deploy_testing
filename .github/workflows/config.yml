@@ -1,4 +1,4 @@
-name: branch-protection
+name: branch-protection.yml
 
 on:
   push:
@@ -12,16 +12,27 @@ jobs:
         node-version: [20]
     steps:
       - name: Check for code changes
-        uses: actions/checkout@v2
-
-      - name: Enforce code coverage report
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.modified, '*.js') }}
         run: |
-          # code to enforce code coverage
+          # commands to enforce branch rules
+          # based on the latest information
 
-      - name: Verify code linting and unit tests
+      - name: Set up job
         run: |
-          # code to verify linting and unit tests
+          # commands to set up job
+
+      - name: Check for code coverage
+        run: |
+          # commands to check code coverage
+
+      - name: Verify code linting
+        run: |
+          # commands to verify code linting
+
+      - name: Run unit tests
+        run: |
+          # commands to run unit tests
 
       - name: Complete job
         run: |
-          # code to complete job successfully
+          # commands to complete job
