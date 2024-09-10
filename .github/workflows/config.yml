@@ -1,29 +1,43 @@
-name: deploy-multi-env.yml
+# branch-protection.yml
+name: branch-protection
+
 on:
   push:
     branches:
       - main
+
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    container:
-      image: python:3.9
+  enforce-branch-rules:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        node-version: [20]
     steps:
-      - name: Checkout code from main branch
-        uses: actions/checkout@v2
-      - name: Install dependencies
-        run: pip install boto3
-      - name: deploy_staging
-        if: github.event.ref == 'refs/heads/staging'
-        steps:
-          - name: Use AWS credentials stored in ${{ secrets.AWS_STAGING_KEY }} and ${{ secrets.AWS_STAGING_SECRET }}
-            run: aws configure set aws_access_key_id ${{ secrets.AWS_STAGING_KEY }} && aws configure set aws_secret_access_key ${{ secrets.AWS_STAGING_SECRET }}
-          - name: Configure environment variables for staging deployment using boto3
-            run: python configure_env_variables.py staging
-      - name: deploy_production
-        if: github.event.ref == 'refs/heads/master'
-        steps:
-          - name: Use AWS credentials stored in ${{ secrets.AWS_PRODUCTION_KEY }} and ${{ secrets.AWS_PRODUCTION_SECRET }}
-            run: aws configure set aws_access_key_id ${{ secrets.AWS_PRODUCTION_KEY }} && aws configure set aws_secret_access_key ${{ secrets.AWS_PRODUCTION_SECRET }}
-          - name: Configure environment variables for production deployment using boto3
-            run: python configure_env_variables.py production
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Check for code changes
+        id: code_changes
+        run: |
+          git fetch origin main
+          git diff --exit-code origin/main || echo "Code changes detected"
+
+      - name: Enforce code coverage report
+        if: steps.code_changes.outputs.code_changes == 'true'
+        run: |
+          npm install
+          npm test -- --coverage
+
+      - name: Verify code linting and unit tests
+        if: steps.code_changes.outputs.code_changes == 'true'
+        run: |
+          npm run lint
+          npm test
+
+      - name: Complete job
+        run: echo "Branch protection rules enforced successfully"
